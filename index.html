@@ -172,8 +172,8 @@
             <!-- Tab 1: Main -->
             <div id="tab-main" class="tab-content active">
                 <div class="text-center mb-8 pt-6">
-                    <input type="text" id="main-title" value="LOVEMORE" class="font-script text-5xl theme-text drop-shadow-sm text-center bg-transparent outline-none w-full placeholder-opacity-50" onchange="saveMeta('title', this.value)">
-                    <input type="text" id="main-subtitle" value="Love Log" class="text-xs text-gray-400 mt-2 tracking-widest uppercase text-center bg-transparent outline-none w-full" onchange="saveMeta('subtitle', this.value)">
+                    <input type="text" id="main-title" value="lovemore" class="font-script text-5xl theme-text drop-shadow-sm text-center bg-transparent outline-none w-full placeholder-opacity-50" onchange="saveMeta('title', this.value)">
+                    <input type="text" id="main-subtitle" value="Love log" class="text-xs text-gray-400 mt-2 tracking-widest uppercase text-center bg-transparent outline-none w-full" onchange="saveMeta('subtitle', this.value)">
                 </div>
                 <div class="flex items-center justify-between px-2 mb-10">
                     <div class="flex flex-col items-center group cursor-pointer" onclick="document.getElementById('file-char-a').click()">
@@ -247,7 +247,7 @@
                             <img id="img-intro-heart" src="https://via.placeholder.com/300x300/e5e7eb/9ca3af?text=Love" class="w-full h-full object-cover">
                             <input type="file" id="file-intro-heart" class="hidden" accept="image/*" onchange="uploadImage(this, 'img-intro-heart', 'introHeart')">
                         </div>
-                        <div class="heart-text" contenteditable="true" onblur="saveMeta('heartText', this.innerText)">YOU<br>AND<br>ME</div>
+                        <div class="heart-text" contenteditable="true" onblur="saveMeta('heartText', this.innerText)">you<br>and<br>me</div>
                     </div>
                     <div class="photobook-grid">
                         <div class="photobook-item" onclick="document.getElementById('file-intro-a').click()">
@@ -534,8 +534,8 @@
 
         // B. 로그 데이터 (Album, Memo, Novel, Music)
         function loadLogs() {
+            // [중요 수정] 인덱스 오류 방지를 위해 orderBy 제거 후 클라이언트 정렬
             db.collection('logs').where('pairCode', '==', myPairCode)
-              .orderBy('createdAt', 'desc')
               .onSnapshot(snapshot => {
                   // 초기화
                   document.getElementById('album-grid').innerHTML = '';
@@ -547,13 +547,26 @@
                   const logs = [];
                   snapshot.forEach(doc => logs.push({id: doc.id, ...doc.data()}));
                   
-                  // 소설은 순서대로 봐야하므로 정렬 다시 (오름차순)
-                  const novels = logs.filter(l => l.type === 'novel').sort((a,b) => a.createdAt - b.createdAt);
-                  const others = logs.filter(l => l.type !== 'novel'); // 나머지는 최신순
+                  // 클라이언트 사이드 정렬 (최신순)
+                  logs.sort((a, b) => {
+                      const t1 = a.createdAt ? a.createdAt.seconds : 0;
+                      const t2 = b.createdAt ? b.createdAt.seconds : 0;
+                      return t2 - t1;
+                  });
+                  
+                  // 소설은 오래된 순 (오름차순)
+                  const novels = logs.filter(l => l.type === 'novel').sort((a,b) => {
+                      const t1 = a.createdAt ? a.createdAt.seconds : 0;
+                      const t2 = b.createdAt ? b.createdAt.seconds : 0;
+                      return t1 - t2;
+                  });
+                  const others = logs.filter(l => l.type !== 'novel');
 
                   // 렌더링
                   others.forEach(data => renderItem(data));
                   novels.forEach(data => renderNovel(data, ++novelCount));
+              }, error => {
+                  console.error("Data Load Error:", error);
               });
         }
 
