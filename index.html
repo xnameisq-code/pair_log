@@ -3,40 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OUR ARCHIVE - Pair Log System</title>
+    <title>OUR ARCHIVE - Connected</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #F7F7F5; }
+        body { font-family: 'Nanum Myeongjo', serif; background-color: #F7F7F5; }
         .notion-card { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #E5E7EB; }
         .editable:empty:before { content: attr(placeholder); color: #9CA3AF; pointer-events: none; display: block; }
-        /* 로딩 스피너 */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: none; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: none; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <div id="login-screen" class="flex flex-col items-center justify-center h-screen">
+    <div id="login-screen" class="flex flex-col items-center justify-center h-screen px-4">
         <h1 class="text-4xl font-bold mb-2 tracking-tight">OUR ARCHIVE</h1>
-        <p class="text-gray-500 mb-8">페어/커플의 소중한 순간을 기록하세요.</p>
+        <p class="text-gray-500 mb-8 text-center">두 사람만의 이야기를 기록하는 공간</p>
         <button id="google-login-btn" class="flex items-center gap-3 bg-white border border-gray-300 px-6 py-3 rounded-lg shadow-sm hover:bg-gray-50 transition">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6">
-            <span class="font-medium">Google 계정으로 계속하기</span>
+            <span class="font-medium">Google 계정으로 시작하기</span>
         </button>
+    </div>
+
+    <div id="pair-connect-screen" class="hidden flex flex-col items-center justify-center h-screen px-4 max-w-md mx-auto w-full">
+        <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 w-full text-center">
+            <h2 class="text-2xl font-bold mb-2">페어 연결하기</h2>
+            <p class="text-gray-500 mb-6 text-sm">상대방과 같은 코드를 사용해야<br>서로의 기록을 공유할 수 있습니다.</p>
+            
+            <div class="mb-6">
+                <label class="block text-left text-xs font-bold text-gray-400 mb-1">초대 코드 (PAIR CODE)</label>
+                <input type="text" id="pair-code-input" placeholder="예: LOVE-1234" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-center text-lg font-bold tracking-widest uppercase focus:outline-none focus:border-black transition">
+                <p class="text-xs text-gray-400 mt-2 text-left">* 새로운 코드를 만들거나, 상대방의 코드를 입력하세요.</p>
+            </div>
+
+            <button id="connect-btn" class="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition">이 코드로 연결하기</button>
+        </div>
     </div>
 
     <div id="app-screen" class="hidden max-w-4xl mx-auto p-6">
         
         <header class="flex justify-between items-center mb-10">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border border-gray-300">
                     <img id="user-profile-img" src="" class="w-full h-full object-cover">
                 </div>
                 <div>
                     <h2 id="user-name" class="font-bold text-lg">사용자</h2>
-                    <p class="text-xs text-gray-500">Log Archive</p>
+                    <p class="text-xs text-gray-500 flex items-center gap-1">
+                        <i class="fas fa-link text-blue-400"></i> Connected: <span id="display-pair-code"></span>
+                    </p>
                 </div>
             </div>
             <button id="logout-btn" class="text-sm text-gray-400 hover:text-red-500">로그아웃</button>
@@ -44,47 +60,41 @@
 
         <div class="bg-white rounded-xl p-8 mb-10 notion-card">
             <div class="flex justify-between items-center mb-6">
-                <span class="text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">NEW LOG</span>
+                <span class="text-xs font-bold text-gray-800 bg-gray-100 px-2 py-1 rounded">NEW RECORD</span>
                 <span class="text-xs text-gray-400" id="current-date"></span>
             </div>
 
-            <input type="text" id="log-title" placeholder="제목을 입력하세요 (예: 첫 만남, 100일 기념)" class="w-full text-3xl font-bold mb-4 outline-none placeholder-gray-300">
+            <input type="text" id="log-title" placeholder="제목" class="w-full text-2xl font-bold mb-4 outline-none placeholder-gray-300 bg-transparent">
 
             <div class="mb-6">
-                <label for="image-upload" class="cursor-pointer flex flex-col items-center justify-center w-full h-48 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:bg-gray-100 transition relative overflow-hidden group">
+                <label for="image-upload" class="cursor-pointer flex flex-col items-center justify-center w-full h-40 bg-gray-50 rounded-lg border border-dashed border-gray-300 hover:bg-gray-100 transition relative overflow-hidden group">
                     <div class="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400 group-hover:text-gray-600">
-                        <i class="fas fa-image text-3xl mb-2"></i>
-                        <p class="text-sm">클릭하여 사진 업로드 (또는 드래그)</p>
+                        <i class="fas fa-camera text-2xl mb-2"></i>
+                        <p class="text-xs">사진 추가</p>
                     </div>
                     <img id="preview-image" class="absolute w-full h-full object-cover hidden">
                     <input id="image-upload" type="file" class="hidden" accept="image/*">
                 </label>
-                <button id="remove-image" class="hidden text-xs text-red-400 mt-2 hover:underline">사진 삭제</button>
+                <button id="remove-image" class="hidden text-xs text-red-400 mt-2 hover:underline text-center w-full">사진 지우기</button>
             </div>
 
-            <div id="log-content" class="editable w-full min-h-[150px] text-gray-700 leading-relaxed outline-none text-lg" contenteditable="true" placeholder="오늘 있었던 일이나 남기고 싶은 말을 자유롭게 적어보세요..."></div>
+            <div id="log-content" class="editable w-full min-h-[100px] text-gray-700 leading-relaxed outline-none text-base" contenteditable="true" placeholder="내용을 입력하세요..."></div>
 
-            <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-100">
+            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
                 <div class="loader" id="save-loader"></div>
-                <button id="save-btn" class="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition">기록 저장하기</button>
+                <button id="save-btn" class="bg-black text-white px-5 py-2 rounded text-sm hover:bg-gray-800 transition">기록하기</button>
             </div>
         </div>
 
-        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-            <i class="fas fa-history text-gray-400"></i> 기록 보관함
-        </h3>
-        <div id="log-list" class="grid gap-6 grid-cols-1 md:grid-cols-2">
-            </div>
-
+        <div id="log-list" class="grid gap-6 grid-cols-1 md:grid-cols-2"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
 
     <script>
-        // ✅ 사용자분이 보내주신 설정값 적용 완료
+        // ✅ 설정값
         const firebaseConfig = {
             apiKey: "AIzaSyAa2SXQ5M5BEVInNSYMn-ZdRAG7D9x1goE",
             authDomain: "pair-log-system.firebaseapp.com",
@@ -95,71 +105,200 @@
             measurementId: "G-YKWTHY0EG3"
         };
 
-        // Firebase 초기화
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const analytics = firebase.analytics(); // 애널리틱스 추가
 
         // DOM 요소
-        const loginScreen = document.getElementById('login-screen');
-        const appScreen = document.getElementById('app-screen');
-        const googleLoginBtn = document.getElementById('google-login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const userName = document.getElementById('user-name');
-        const userProfileImg = document.getElementById('user-profile-img');
+        const screens = {
+            login: document.getElementById('login-screen'),
+            connect: document.getElementById('pair-connect-screen'),
+            app: document.getElementById('app-screen')
+        };
         
-        const saveBtn = document.getElementById('save-btn');
-        const logTitle = document.getElementById('log-title');
-        const logContent = document.getElementById('log-content');
-        const imageUpload = document.getElementById('image-upload');
-        const previewImage = document.getElementById('preview-image');
-        const removeImage = document.getElementById('remove-image');
-        const logList = document.getElementById('log-list');
-        const saveLoader = document.getElementById('save-loader');
-
         let currentUser = null;
+        let myPairCode = null; // 현재 사용자의 페어 코드
         let selectedImageBase64 = null;
 
-        // 1. 구글 로그인
-        googleLoginBtn.addEventListener('click', () => {
+        // 1. 로그인 로직
+        document.getElementById('google-login-btn').addEventListener('click', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch(error => {
-                alert("로그인 실패: " + error.message);
-                console.error(error);
-            });
+            auth.signInWithPopup(provider);
         });
 
-        // 인증 상태 변화 감지
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             if (user) {
                 currentUser = user;
-                loginScreen.classList.add('hidden');
-                appScreen.classList.remove('hidden');
-                userName.textContent = user.displayName;
-                userProfileImg.src = user.photoURL;
-                loadLogs();
+                // 사용자 정보를 확인하여 페어 코드가 있는지 체크
+                await checkUserPairStatus(user);
             } else {
-                currentUser = null;
-                loginScreen.classList.remove('hidden');
-                appScreen.classList.add('hidden');
+                switchScreen('login');
             }
         });
 
-        // 로그아웃
-        logoutBtn.addEventListener('click', () => auth.signOut());
+        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
 
-        // 2. 이미지 처리 (Base64 변환)
+        // 2. 화면 전환 함수
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(el => el.classList.add('hidden'));
+            screens[screenName].classList.remove('hidden');
+        }
+
+        // 3. 사용자 페어 상태 확인 (핵심 로직)
+        async function checkUserPairStatus(user) {
+            // 'users' 컬렉션에서 내 정보를 찾음
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            
+            if (userDoc.exists && userDoc.data().pairCode) {
+                // 이미 코드가 있다면 바로 앱으로 이동
+                myPairCode = userDoc.data().pairCode;
+                enterApp(user);
+            } else {
+                // 코드가 없다면 연동 화면으로 이동
+                switchScreen('connect');
+            }
+        }
+
+        // 4. 페어 코드 연결하기
+        document.getElementById('connect-btn').addEventListener('click', async () => {
+            const inputCode = document.getElementById('pair-code-input').value.trim().toUpperCase();
+            
+            if (inputCode.length < 3) {
+                alert("코드는 3글자 이상이어야 합니다.");
+                return;
+            }
+
+            try {
+                // 내 정보에 페어 코드 저장 ('users' 컬렉션 생성)
+                await db.collection('users').doc(currentUser.uid).set({
+                    email: currentUser.email,
+                    displayName: currentUser.displayName,
+                    pairCode: inputCode,
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                myPairCode = inputCode;
+                alert(`환영합니다! 페어 코드 [${inputCode}]로 연결되었습니다.`);
+                enterApp(currentUser);
+
+            } catch (error) {
+                console.error("Error linking pair: ", error);
+                alert("연결 중 오류가 발생했습니다.");
+            }
+        });
+
+        // 5. 앱 진입 및 데이터 로드
+        function enterApp(user) {
+            switchScreen('app');
+            document.getElementById('user-name').innerText = user.displayName;
+            document.getElementById('user-profile-img').src = user.photoURL;
+            document.getElementById('display-pair-code').innerText = myPairCode;
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString();
+            
+            loadLogs(); // 로그 불러오기
+        }
+
+        // 6. 데이터 저장 (페어 코드 포함)
+        document.getElementById('save-btn').addEventListener('click', async () => {
+            const title = document.getElementById('log-title').value;
+            const content = document.getElementById('log-content').innerHTML;
+
+            if (!title || !document.getElementById('log-content').innerText.trim()) {
+                alert("내용을 입력해주세요.");
+                return;
+            }
+
+            document.getElementById('save-loader').style.display = 'block';
+            
+            try {
+                await db.collection('logs').add({
+                    pairCode: myPairCode, // ★ 핵심: 내 ID가 아니라 '방 번호'를 저장
+                    writerUid: currentUser.uid, // 작성자는 기록해둠
+                    writerName: currentUser.displayName,
+                    title: title,
+                    content: content,
+                    image: selectedImageBase64,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    dateStr: new Date().toLocaleDateString()
+                });
+
+                // 초기화
+                document.getElementById('log-title').value = '';
+                document.getElementById('log-content').innerHTML = '';
+                document.getElementById('remove-image').click();
+                loadLogs();
+
+            } catch (e) {
+                console.error(e);
+                alert("저장 실패");
+            } finally {
+                document.getElementById('save-loader').style.display = 'none';
+            }
+        });
+
+        // 7. 데이터 불러오기 (페어 코드로 필터링)
+        async function loadLogs() {
+            const logList = document.getElementById('log-list');
+            logList.innerHTML = '';
+
+            // ★ 핵심: 'uid'가 아니라 'pairCode'가 같은 글을 가져옴
+            const snapshot = await db.collection('logs')
+                .where("pairCode", "==", myPairCode)
+                .orderBy("createdAt", "desc")
+                .get();
+
+            if (snapshot.empty) {
+                logList.innerHTML = '<p class="text-gray-400 p-4 col-span-2 text-center">아직 작성된 기록이 없습니다.<br>첫 번째 이야기를 남겨보세요.</p>';
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const isMyPost = data.writerUid === currentUser.uid;
+                
+                // 카드 HTML
+                const div = document.createElement('div');
+                div.className = "bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col relative";
+                
+                let imageHtml = data.image ? `<div class="w-full h-48 bg-gray-100 rounded mb-4 overflow-hidden"><img src="${data.image}" class="w-full h-full object-cover"></div>` : '';
+                
+                // 작성자 표시 (내가 쓴 건지, 상대가 쓴 건지)
+                const badge = isMyPost 
+                    ? `<span class="bg-black text-white text-[10px] px-2 py-0.5 rounded-full absolute top-6 right-6">ME</span>`
+                    : `<span class="bg-gray-200 text-gray-600 text-[10px] px-2 py-0.5 rounded-full absolute top-6 right-6">PARTNER</span>`;
+
+                const shareText = encodeURIComponent(`[${data.title}]\n${data.content.substring(0, 30).replace(/<[^>]*>/g, '')}...\n#OurArchive`);
+                const shareUrl = `https://twitter.com/intent/tweet?text=${shareText}`;
+
+                div.innerHTML = `
+                    ${badge}
+                    ${imageHtml}
+                    <div class="mb-3 mt-1">
+                        <h4 class="font-bold text-xl font-serif">${data.title}</h4>
+                        <span class="text-xs text-gray-400">${data.dateStr} · by ${data.writerName}</span>
+                    </div>
+                    <div class="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3 font-serif">${data.content}</div>
+                    
+                    <div class="mt-auto flex justify-end gap-3 pt-3 border-t border-gray-50">
+                        ${isMyPost ? `<button onclick="deleteLog('${doc.id}')" class="text-xs text-red-300 hover:text-red-500">삭제</button>` : ''}
+                        <a href="${shareUrl}" target="_blank" class="text-xs text-gray-400 hover:text-blue-400 flex items-center gap-1"><i class="fab fa-x-twitter"></i> 공유</a>
+                    </div>
+                `;
+                logList.appendChild(div);
+            });
+        }
+
+        // 이미지 처리 로직 등은 동일
+        const imageUpload = document.getElementById('image-upload');
+        const previewImage = document.getElementById('preview-image');
+        const removeImage = document.getElementById('remove-image');
+
         imageUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                // 용량 제한 체크 (약 1MB 이상이면 경고)
-                if (file.size > 1024 * 1024) {
-                    alert("사진 용량이 너무 큽니다! (1MB 이하 권장)");
-                    return;
-                }
+                if (file.size > 1024 * 1024) return alert("1MB 이하 이미지만 가능합니다.");
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = (e) => {
                     selectedImageBase64 = e.target.result;
                     previewImage.src = selectedImageBase64;
                     previewImage.classList.remove('hidden');
@@ -177,108 +316,12 @@
             imageUpload.value = '';
         });
 
-        // 3. 저장 기능
-        saveBtn.addEventListener('click', async () => {
-            if (!logTitle.value || !logContent.innerText.trim()) {
-                alert("제목과 내용을 입력해주세요!");
-                return;
-            }
-
-            saveLoader.style.display = "block";
-            saveBtn.disabled = true;
-
-            try {
-                await db.collection('logs').add({
-                    uid: currentUser.uid,
-                    title: logTitle.value,
-                    content: logContent.innerHTML,
-                    image: selectedImageBase64,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    dateStr: new Date().toLocaleDateString()
-                });
-
-                logTitle.value = '';
-                logContent.innerHTML = '';
-                removeImage.click();
-                loadLogs();
-                alert("기록되었습니다!");
-
-            } catch (error) {
-                console.error("Error saving document: ", error);
-                alert("저장 실패! 콘솔을 확인해주세요.\n(Tip: Firestore 데이터베이스가 생성되었는지, 규칙이 적절한지 확인하세요)");
-            } finally {
-                saveLoader.style.display = "none";
-                saveBtn.disabled = false;
-            }
-        });
-
-        // 4. 불러오기 기능
-        async function loadLogs() {
-            if (!currentUser) return;
-            logList.innerHTML = '';
-            
-            try {
-                const snapshot = await db.collection('logs')
-                    .where("uid", "==", currentUser.uid)
-                    .orderBy("createdAt", "desc")
-                    .get();
-
-                if (snapshot.empty) {
-                    logList.innerHTML = '<p class="text-gray-400 p-4">아직 작성된 기록이 없습니다.</p>';
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    logList.appendChild(createCardElement(doc.id, doc.data()));
-                });
-            } catch (error) {
-                console.error("Error loading docs: ", error);
-                // 인덱스 에러 처리 (복합 쿼리 시 필요할 수 있음)
-                if (error.code === 'failed-precondition') {
-                   console.log("인덱스가 필요할 수 있습니다. 콘솔의 링크를 확인하세요.");
-                }
-            }
-        }
-
-        // 5. 카드 UI 생성
-        function createCardElement(docId, data) {
-            const div = document.createElement('div');
-            div.className = "bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition flex flex-col";
-            
-            let imageHtml = '';
-            if (data.image) {
-                imageHtml = `<div class="w-full h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden"><img src="${data.image}" class="w-full h-full object-cover"></div>`;
-            }
-
-            const shareText = encodeURIComponent(`[${data.title}]\n${data.content.substring(0, 30).replace(/<[^>]*>/g, '')}...\n#OurArchive`);
-            const shareUrl = `https://twitter.com/intent/tweet?text=${shareText}`;
-
-            div.innerHTML = `
-                ${imageHtml}
-                <div class="mb-2 flex justify-between items-start">
-                    <h4 class="font-bold text-lg leading-tight">${data.title}</h4>
-                    <span class="text-xs text-gray-400 whitespace-nowrap">${data.dateStr || 'Today'}</span>
-                </div>
-                <div class="text-gray-600 text-sm mb-4 line-clamp-3">${data.content}</div>
-                <div class="mt-auto flex justify-end gap-2 pt-3 border-t border-gray-100">
-                    <button onclick="deleteLog('${docId}')" class="text-xs text-red-400 hover:text-red-600 px-2 py-1">삭제</button>
-                    <a href="${shareUrl}" target="_blank" class="text-xs bg-black text-white px-3 py-1.5 rounded hover:bg-gray-800 transition flex items-center gap-1">
-                        <i class="fab fa-x-twitter"></i> 공유
-                    </a>
-                </div>
-            `;
-            return div;
-        }
-
-        // 6. 삭제 기능
         window.deleteLog = async (docId) => {
-            if(confirm("정말 삭제하시겠습니까?")) {
+            if(confirm("기록을 삭제하시겠습니까?")) {
                 await db.collection('logs').doc(docId).delete();
                 loadLogs();
             }
         }
-        
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString();
     </script>
 </body>
 </html>
