@@ -168,7 +168,7 @@
             <div id="tab-main" class="tab-content active">
                 <div class="text-center mb-8 pt-6">
                     <input type="text" id="main-title" value="Lovemore" class="font-script text-5xl theme-text drop-shadow-sm text-center bg-transparent outline-none w-full placeholder-opacity-50" onchange="saveMeta('title', this.value)">
-                    <input type="text" id="main-subtitle" value="Love LOG" class="text-xs text-gray-400 mt-2 tracking-widest uppercase text-center bg-transparent outline-none w-full" onchange="saveMeta('subtitle', this.value)">
+                    <input type="text" id="main-subtitle" value="Love log" class="text-xs text-gray-400 mt-2 tracking-widest uppercase text-center bg-transparent outline-none w-full" onchange="saveMeta('subtitle', this.value)">
                 </div>
                 <div class="flex items-center justify-between px-2 mb-10">
                     <div class="flex flex-col items-center group cursor-pointer" onclick="document.getElementById('file-char-a').click()">
@@ -194,7 +194,7 @@
                     <div class="w-full bg-gray-100 rounded-full h-2.5 relative">
                         <div id="anniversary-bar" class="theme-bg h-2.5 rounded-full progress-bar-fill relative shadow-sm" style="width: 0%"><div id="percent-tooltip" class="percent-tooltip" style="left: 100%">0%</div></div>
                     </div>
-                    <p id="remaining-days-text" class="text-center text-[10px] text-gray-400 mt-3">다음 기념일까지 함께 손잡고 열심히 달려가는 중! 🏃‍♂️</p>
+                    <p id="remaining-days-text" class="text-center text-[10px] text-gray-400 mt-3">다음 기념일까지 함께 달려가는 중! 🏃‍♂️</p>
                 </div>
                 <div class="mb-8">
                     <div class="main-photo-frame group cursor-pointer" onclick="document.getElementById('file-main-photo').click()">
@@ -242,7 +242,7 @@
                             <img id="img-intro-heart" src="https://via.placeholder.com/300x300/e5e7eb/9ca3af?text=Love" class="w-full h-full object-cover">
                             <input type="file" id="file-intro-heart" class="hidden" accept="image/*" onchange="uploadImage(this, 'img-intro-heart', 'introHeart')">
                         </div>
-                        <div class="heart-text" contenteditable="true" onblur="saveMeta('heartText', this.innerText)">you<br>and<br>me</div>
+                        <div class="heart-text" contenteditable="true" onblur="saveMeta('heartText', this.innerText)">YOU<br>AND<br>ME</div>
                     </div>
                     <div class="photobook-grid">
                         <div class="photobook-item" onclick="document.getElementById('file-intro-a').click()">
@@ -730,5 +730,3 @@
     </script>
 </body>
 </html>
-
-
