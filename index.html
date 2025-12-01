@@ -3,98 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OUR ARCHIVE - Connected</title>
+    <title>OUR ARCHIVE - Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 폰트: 감성적인 폰트 모음 -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@300;400;700&family=Gowun+Dodum&family=Gaegu&family=Do+Hyeon&family=Song+Myung&family=Jua&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Nanum Myeongjo', serif; background-color: #F7F7F5; }
-        .notion-card { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #E5E7EB; }
-        .editable:empty:before { content: attr(placeholder); color: #9CA3AF; pointer-events: none; display: block; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: none; margin: 0 auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* CSS 변수: 테마 시스템 */
+        :root {
+            --theme-color: #FFCDC9;       /* 메인 포인트 (기본: 딸기크림) */
+            --theme-light: #FFF0EE;       /* 연한 배경 */
+            --bg-color: #FFFAFA;          /* 앱 배경 */
+            --text-color: #374151;        /* 글자색 */
+            --main-font: 'Noto Sans KR', sans-serif; /* 기본 폰트 */
+            
+            --base-font-size: 16px;
+            --line-height: 1.6;
+            --letter-spacing: 0px;
+            --font-weight: 400;
+            --font-style: normal;
+        }
+
+        body { 
+            font-family: var(--main-font); background-color: var(--bg-color); color: var(--text-color);
+            font-size: var(--base-font-size); line-height: var(--line-height); letter-spacing: var(--letter-spacing);
+            font-weight: var(--font-weight); font-style: var(--font-style);
+            overflow-x: hidden; transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 유틸리티 클래스 */
+        .font-script { font-family: 'Dancing Script', cursive; }
+        .font-hand { font-family: 'Nanum Pen Script', cursive; }
+        .font-novel { font-family: 'Song Myung', serif; }
+        .theme-text { color: var(--theme-color) !important; }
+        .theme-bg { background-color: var(--theme-color) !important; }
+        
+        /* 레이아웃 & 탭바 */
+        .app-container { display: flex; min-height: 100vh; max-width: 600px; margin: 0 auto; background-color: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.05); position: relative; }
+        .content-area { flex-grow: 1; padding-bottom: 40px; min-height: 100vh; background-color: #fff; overflow-y: auto; position: relative; }
+        .tab-bar { width: 70px; background-color: #ffffff; border-left: 1px solid #f3f4f6; display: flex; flex-direction: column; align-items: center; padding-top: 20px; z-index: 50; flex-shrink: 0; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #d1d5db; font-size: 0.65rem; cursor: pointer; transition: all 0.2s; width: 100%; height: 70px; position: relative; margin-bottom: 8px; }
+        .tab-item.active { color: var(--theme-color); background-color: #fff; font-weight: bold; }
+        .tab-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background-color: var(--theme-color); border-radius: 0 4px 4px 0; }
+        .tab-icon { font-size: 1.4rem; margin-bottom: 4px; transition: transform 0.2s; }
+        .tab-item:hover .tab-icon { transform: scale(1.1); }
+        .tab-content { display: none; padding: 24px; animation: fadeIn 0.3s ease-out; min-height: 100%; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* 공통 요소 */
+        .fab-btn { position: fixed; bottom: 30px; right: 90px; width: 50px; height: 50px; background-color: var(--theme-color); color: #374151; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.2s; z-index: 40; }
+        .fab-btn:hover { transform: scale(1.1) rotate(90deg); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .upload-modal-box { background: white; width: 90%; max-width: 320px; padding: 20px; border-radius: 16px; text-align: center; transform: translateY(20px); transition: transform 0.3s; }
+        .modal-overlay.open .upload-modal-box { transform: translateY(0); }
+        .full-screen-modal-box { background: white; width: 100%; height: 100%; max-width: 600px; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s; }
+        .modal-overlay.open .full-screen-modal-box { transform: translateY(0); }
+
+        /* 탭별 스타일 */
+        /* 메인 */
+        .profile-img-container { width: 70px; height: 70px; border-radius: 50%; overflow: hidden; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; background-color: #f3f4f6; }
+        .main-photo-frame { width: 100%; aspect-ratio: 4 / 3; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); position: relative; background-color: #f3f4f6; }
+        .progress-bar-fill { transition: width 1s ease-in-out; background-color: var(--theme-color); }
+        .percent-tooltip { position: absolute; top: -30px; transform: translateX(-50%); background-color: var(--theme-color); color: #374151; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; white-space: nowrap; }
+        .percent-tooltip::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid var(--theme-color); }
+        
+        /* 앨범 */
+        .album-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding-bottom: 60px; }
+        .polaroid { background-color: white; padding: 8px 8px 35px 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: pointer; position: relative; transform: rotate(0deg); }
+        .polaroid:hover { transform: scale(1.05) rotate(1deg) !important; z-index: 10; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .polaroid-img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background-color: #eee; display: block; }
+        .polaroid-caption { position: absolute; bottom: 5px; left: 0; width: 100%; text-align: center; font-family: var(--main-font); font-size: 1.1rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
+
+        /* 메모장 */
+        .memo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding-bottom: 60px; }
+        .memo-card { background-color: var(--theme-light); background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 15px 15px; padding: 20px 15px 15px 15px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: relative; min-height: 140px; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; }
+        .memo-tape { position: absolute; top: -8px; left: 50%; transform: translateX(-50%) rotate(-2deg); width: 40%; height: 18px; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(2px); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .memo-content { font-family: var(--main-font); font-size: 0.9rem; flex-grow: 1; margin-bottom: 10px; white-space: pre-wrap; word-break: break-all; line-height: 1.5; }
+        .memo-footer { border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #6b7280; }
+
+        /* 로그 (소설책) */
+        .book-container { padding: 10px 10px 80px 10px; }
+        .book-header { text-align: center; margin-bottom: 60px; padding-top: 20px; border-bottom: 2px double var(--theme-color); padding-bottom: 40px; }
+        .book-title { font-family: 'Song Myung', serif; font-size: 3rem; color: #1f2937; margin-bottom: 10px; }
+        .book-subtitle { font-family: 'Song Myung', serif; color: var(--theme-color); letter-spacing: 3px; font-size: 0.9rem; }
+        .novel-chapter { margin-bottom: 60px; cursor: pointer; position: relative; }
+        .novel-chapter:hover .chapter-edit-hint { opacity: 1; }
+        .chapter-edit-hint { position: absolute; top: 0; right: 0; font-size: 0.8rem; color: #d1d5db; opacity: 0; transition: opacity 0.2s; }
+        .chapter-header { text-align: center; margin-bottom: 30px; }
+        .chapter-title { font-family: 'Song Myung', serif; font-size: 1.8rem; color: #111827; font-weight: bold; line-height: 1.3; }
+        .chapter-content { font-family: 'Song Myung', serif; font-size: 1.1rem; line-height: 2.0; color: #374151; text-align: justify; white-space: pre-wrap; margin-bottom: 20px; padding: 0 10px; }
+        .chapter-divider { text-align: center; color: var(--theme-color); font-size: 1.2rem; margin: 60px 0; opacity: 0.6; }
+        
+        /* 음악 */
+        .music-list { display: flex; flex-direction: column; gap: 20px; padding-bottom: 60px; }
+        .music-card { background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
+        .music-video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background-color: #000; }
+        .music-video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .music-info { padding: 16px; display: flex; justify-content: space-between; align-items: center; background-color: #fff; }
+
+        /* 소개 */
+        .intro-container { padding: 10px; padding-bottom: 60px; }
+        .heart-frame-wrapper { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 40px; padding-top: 20px; }
+        .heart-image-container { width: 140px; height: 120px; position: relative; clip-path: path('M70 120 C70 120 140 78 140 42 C140 18 122 0 98 0 C82 0 70 18 70 18 C70 18 58 0 42 0 C18 0 0 18 0 42 C0 78 70 120 70 120 Z'); background-color: var(--theme-light); cursor: pointer; transition: transform 0.2s; }
+        .heart-text { font-family: 'Dancing Script', cursive; font-size: 1.5rem; color: #374151; line-height: 1.2; text-align: left; }
+        .photobook-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 30px; }
+        .photobook-item { width: 100%; aspect-ratio: 3 / 4; background-color: #f3f4f6; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; }
+        .photobook-item img { width: 100%; height: 100%; object-fit: cover; }
+        .info-split-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .info-block { background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 15px; min-height: 200px; }
+        .info-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; background-color: rgba(255,255,255,0.5); border-radius: 4px; margin-bottom: 8px; }
+        .info-key { font-weight: bold; margin-right: 5px; color: var(--theme-color); font-size: 0.8rem; }
+        .info-val { text-align: right; font-size: 0.8rem; }
+
+        /* 설정 */
+        .color-palette { display: flex; gap: 10px; flex-wrap: wrap; }
+        .color-option { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .color-option.selected { border-color: #374151; transform: scale(1.1); }
+        .font-option { padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .font-option.selected { border-color: var(--theme-color); background-color: var(--theme-light); }
+        .style-toggle { padding: 8px 16px; border: 1px solid #e5e7eb; border-radius: 20px; cursor: pointer; transition: all 0.2s; background-color: white; font-size: 0.9rem; color: #6b7280; }
+        .style-toggle.active { background-color: var(--theme-color); color: #374151; border-color: var(--theme-color); font-weight: bold; }
+
+        /* 인증 화면 스타일 */
+        .auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #F7F7F5; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="bg-gray-50 flex justify-center">
 
-    <div id="login-screen" class="flex flex-col items-center justify-center h-screen px-4">
-        <h1 class="text-4xl font-bold mb-2 tracking-tight">OUR ARCHIVE</h1>
-        <p class="text-gray-500 mb-8 text-center">두 사람만의 이야기를 기록하는 공간</p>
+    <!-- 1. 로그인 화면 -->
+    <div id="login-screen" class="auth-screen">
+        <h1 class="font-script text-6xl text-gray-800 mb-2">Our Archive</h1>
+        <p class="text-gray-500 mb-8 font-novel">둘만의 이야기를 기록하세요.</p>
         <button id="google-login-btn" class="flex items-center gap-3 bg-white border border-gray-300 px-6 py-3 rounded-lg shadow-sm hover:bg-gray-50 transition">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6">
             <span class="font-medium">Google 계정으로 시작하기</span>
         </button>
     </div>
 
-    <div id="pair-connect-screen" class="hidden flex flex-col items-center justify-center h-screen px-4 max-w-md mx-auto w-full">
-        <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 w-full text-center">
-            <h2 class="text-2xl font-bold mb-2">페어 연결하기</h2>
-            <p class="text-gray-500 mb-6 text-sm">상대방과 같은 코드를 사용해야<br>서로의 기록을 공유할 수 있습니다.</p>
-            
+    <!-- 2. 페어 연결 화면 -->
+    <div id="connect-screen" class="auth-screen hidden">
+        <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 max-w-sm w-full text-center">
+            <h2 class="text-2xl font-bold mb-2 font-novel">페어 연결</h2>
+            <p class="text-gray-500 mb-6 text-sm">상대방과 같은 코드를 입력하세요.</p>
             <div class="mb-6">
-                <label class="block text-left text-xs font-bold text-gray-400 mb-1">초대 코드 (PAIR CODE)</label>
-                <input type="text" id="pair-code-input" placeholder="예: LOVE-1234" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-center text-lg font-bold tracking-widest uppercase focus:outline-none focus:border-black transition">
-                <p class="text-xs text-gray-400 mt-2 text-left">* 새로운 코드를 만들거나, 상대방의 코드를 입력하세요.</p>
+                <label class="block text-left text-xs font-bold text-gray-400 mb-1">PAIR CODE</label>
+                <input type="text" id="pair-code-input" placeholder="LOVE-1234" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-center text-lg font-bold tracking-widest uppercase focus:outline-none focus:border-black transition">
+                <p class="text-xs text-gray-400 mt-2 text-left">* 3글자 이상 입력</p>
             </div>
-
-            <button id="connect-btn" class="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition">이 코드로 연결하기</button>
+            <button id="connect-btn" class="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition">입장하기</button>
         </div>
     </div>
 
-    <div id="app-screen" class="hidden max-w-4xl mx-auto p-6">
+    <!-- 3. 메인 앱 화면 -->
+    <div id="app-screen" class="app-container w-full hidden">
         
-        <header class="flex justify-between items-center mb-10">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden border border-gray-300">
-                    <img id="user-profile-img" src="" class="w-full h-full object-cover">
+        <!-- 콘텐츠 영역 -->
+        <div class="content-area">
+            
+            <!-- Tab 1: Main -->
+            <div id="tab-main" class="tab-content active">
+                <div class="text-center mb-8 pt-6">
+                    <input type="text" id="main-title" value="Soulmate" class="font-script text-5xl theme-text drop-shadow-sm text-center bg-transparent outline-none w-full placeholder-opacity-50" onchange="saveMeta('title', this.value)">
+                    <input type="text" id="main-subtitle" value="Love Record" class="text-xs text-gray-400 mt-2 tracking-widest uppercase text-center bg-transparent outline-none w-full" onchange="saveMeta('subtitle', this.value)">
                 </div>
-                <div>
-                    <h2 id="user-name" class="font-bold text-lg">사용자</h2>
-                    <p class="text-xs text-gray-500 flex items-center gap-1">
-                        <i class="fas fa-link text-blue-400"></i> Connected: <span id="display-pair-code"></span>
-                    </p>
-                </div>
-            </div>
-            <button id="logout-btn" class="text-sm text-gray-400 hover:text-red-500">로그아웃</button>
-        </header>
-
-        <div class="bg-white rounded-xl p-8 mb-10 notion-card">
-            <div class="flex justify-between items-center mb-6">
-                <span class="text-xs font-bold text-gray-800 bg-gray-100 px-2 py-1 rounded">NEW RECORD</span>
-                <span class="text-xs text-gray-400" id="current-date"></span>
-            </div>
-
-            <input type="text" id="log-title" placeholder="제목" class="w-full text-2xl font-bold mb-4 outline-none placeholder-gray-300 bg-transparent">
-
-            <div class="mb-6">
-                <label for="image-upload" class="cursor-pointer flex flex-col items-center justify-center w-full h-40 bg-gray-50 rounded-lg border border-dashed border-gray-300 hover:bg-gray-100 transition relative overflow-hidden group">
-                    <div class="flex flex-col items-center justify-center pt-5 pb-6 text-gray-400 group-hover:text-gray-600">
-                        <i class="fas fa-camera text-2xl mb-2"></i>
-                        <p class="text-xs">사진 추가</p>
+                <div class="flex items-center justify-between px-2 mb-10">
+                    <div class="flex flex-col items-center group cursor-pointer" onclick="document.getElementById('file-char-a').click()">
+                        <div class="profile-img-container"><img id="img-char-a" src="https://via.placeholder.com/150/e5e7eb/9ca3af?text=A" class="w-full h-full object-cover"></div>
+                        <input type="text" id="name-a" value="Name A" class="mt-3 text-xs font-bold text-gray-600 text-center bg-transparent border-b border-transparent focus:border-gray-300 outline-none w-16" onchange="saveMeta('nameA', this.value)">
+                        <input type="file" id="file-char-a" class="hidden" accept="image/*" onchange="uploadImage(this, 'img-char-a', 'profileA')">
                     </div>
-                    <img id="preview-image" class="absolute w-full h-full object-cover hidden">
-                    <input id="image-upload" type="file" class="hidden" accept="image/*">
-                </label>
-                <button id="remove-image" class="hidden text-xs text-red-400 mt-2 hover:underline text-center w-full">사진 지우기</button>
+                    <div class="flex flex-col items-center justify-center -mt-4 mx-2">
+                        <i class="fas fa-heart theme-text text-xl animate-pulse mb-1"></i>
+                        <span id="d-day-display" class="text-lg font-bold text-gray-700">D+0</span>
+                        <input type="date" id="start-date" class="mt-1 text-[10px] bg-transparent text-gray-400 border border-gray-200 rounded px-1 outline-none" onchange="saveMeta('startDate', this.value); calculateDDay();">
+                    </div>
+                    <div class="flex flex-col items-center group cursor-pointer" onclick="document.getElementById('file-char-b').click()">
+                        <div class="profile-img-container"><img id="img-char-b" src="https://via.placeholder.com/150/e5e7eb/9ca3af?text=B" class="w-full h-full object-cover"></div>
+                        <input type="text" id="name-b" value="Name B" class="mt-3 text-xs font-bold text-gray-600 text-center bg-transparent border-b border-transparent focus:border-gray-300 outline-none w-16" onchange="saveMeta('nameB', this.value)">
+                        <input type="file" id="file-char-b" class="hidden" accept="image/*" onchange="uploadImage(this, 'img-char-b', 'profileB')">
+                    </div>
+                </div>
+                <div class="mb-12 px-2">
+                    <div class="flex justify-between text-xs text-gray-400 mb-2 font-medium">
+                        <span id="progress-start-label">Start</span><span id="progress-end-label">100 Days</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2.5 relative">
+                        <div id="anniversary-bar" class="theme-bg h-2.5 rounded-full progress-bar-fill relative shadow-sm" style="width: 0%"><div id="percent-tooltip" class="percent-tooltip" style="left: 100%">0%</div></div>
+                    </div>
+                    <p id="remaining-days-text" class="text-center text-[10px] text-gray-400 mt-3">다음 기념일까지 함께 달려가는 중! 🏃‍♂️</p>
+                </div>
+                <div class="mb-8">
+                    <div class="main-photo-frame group cursor-pointer" onclick="document.getElementById('file-main-photo').click()">
+                        <img id="img-main-photo" src="https://via.placeholder.com/400x300/f3f4f6/d1d5db?text=Touch+to+Add+Photo" class="w-full h-full object-cover">
+                        <input type="file" id="file-main-photo" class="hidden" accept="image/*" onchange="uploadImage(this, 'img-main-photo', 'mainPhoto')">
+                    </div>
+                </div>
             </div>
 
-            <div id="log-content" class="editable w-full min-h-[100px] text-gray-700 leading-relaxed outline-none text-base" contenteditable="true" placeholder="내용을 입력하세요..."></div>
+            <!-- Tab 2: Album -->
+            <div id="tab-album" class="tab-content">
+                <h2 class="font-script text-3xl mb-6 text-center theme-text">Photo Album</h2>
+                <div id="album-grid" class="album-grid"></div>
+                <div class="fab-btn" onclick="openUploadModal()"><i class="fas fa-plus"></i></div>
+            </div>
 
-            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
-                <div class="loader" id="save-loader"></div>
-                <button id="save-btn" class="bg-black text-white px-5 py-2 rounded text-sm hover:bg-gray-800 transition">기록하기</button>
+            <!-- Tab 3: Memo -->
+            <div id="tab-memo" class="tab-content">
+                <h2 class="font-script text-3xl mb-6 text-center theme-text">Memo Pad</h2>
+                <div id="memo-grid" class="memo-grid"></div>
+                <div class="fab-btn" onclick="openMemoModal()"><i class="fas fa-plus"></i></div>
+            </div>
+
+            <!-- Tab 4: Log (Novel) -->
+            <div id="tab-log" class="tab-content">
+                <div class="book-container">
+                    <div class="book-header"><h1 class="book-title">Our Story</h1><p class="book-subtitle">우리의 모든 순간</p></div>
+                    <div id="novel-book-body"></div>
+                    <div class="fab-btn" onclick="openLogModal()"><i class="fas fa-pen-nib"></i></div>
+                </div>
+            </div>
+
+            <!-- Tab 5: Playlist -->
+            <div id="tab-playlist" class="tab-content">
+                <h2 class="font-script text-3xl mb-6 text-center theme-text">Our Playlist</h2>
+                <div id="playlist-container" class="music-list"></div>
+                <div class="fab-btn" onclick="openMusicModal()"><i class="fas fa-music"></i></div>
+            </div>
+
+            <!-- Tab 6: Profile (Intro) -->
+            <div id="tab-profile" class="tab-content">
+                <div class="intro-container">
+                    <div class="heart-frame-wrapper">
+                        <div class="heart-image-container group" onclick="document.getElementById('file-intro-heart').click()">
+                            <img id="img-intro-heart" src="https://via.placeholder.com/300x300/e5e7eb/9ca3af?text=Love" class="w-full h-full object-cover">
+                            <input type="file" id="file-intro-heart" class="hidden" accept="image/*" onchange="uploadImage(this, 'img-intro-heart', 'introHeart')">
+                        </div>
+                        <div class="heart-text" contenteditable="true" onblur="saveMeta('heartText', this.innerText)">ONE MONTH<br>WITH ✻ MY<br>STARLIGHT</div>
+                    </div>
+                    <div class="photobook-grid">
+                        <div class="photobook-item" onclick="document.getElementById('file-intro-a').click()">
+                            <img id="img-intro-a" src="https://via.placeholder.com/300x400/e5e7eb/9ca3af?text=A" class="w-full h-full object-cover">
+                            <input type="file" id="file-intro-a" class="hidden" accept="image/*" onchange="uploadImage(this, 'img-intro-a', 'introA')">
+                        </div>
+                        <div class="photobook-item" onclick="document.getElementById('file-intro-couple').click()">
+                            <img id="img-intro-couple" src="https://via.placeholder.com/300x400/f3f4f6/d1d5db?text=Couple" class="w-full h-full object-cover">
+                            <input type="file" id="file-intro-couple" class="hidden" accept="image/*" onchange="uploadImage(this, 'img-intro-couple', 'introCouple')">
+                        </div>
+                        <div class="photobook-item" onclick="document.getElementById('file-intro-b').click()">
+                            <img id="img-intro-b" src="https://via.placeholder.com/300x400/e5e7eb/9ca3af?text=B" class="w-full h-full object-cover">
+                            <input type="file" id="file-intro-b" class="hidden" accept="image/*" onchange="uploadImage(this, 'img-intro-b', 'introB')">
+                        </div>
+                    </div>
+                    <!-- Intro Info (Simplified for demo) -->
+                    <div class="info-split-container">
+                        <div class="info-block">
+                            <div class="info-header"><div class="info-name">A's Info</div></div>
+                            <div id="info-list-a" class="info-list"></div>
+                            <button class="add-info-btn-small" onclick="addInfoItem('a')">+ Add</button>
+                        </div>
+                        <div class="info-block">
+                            <div class="info-header"><div class="info-name">B's Info</div></div>
+                            <div id="info-list-b" class="info-list"></div>
+                            <button class="add-info-btn-small" onclick="addInfoItem('b')">+ Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 7: Settings -->
+            <div id="tab-settings" class="tab-content">
+                <h2 class="text-2xl font-bold mb-6 theme-text"><i class="fas fa-cog mr-2"></i>설정</h2>
+                <div class="setting-section">
+                    <div class="setting-title"><i class="fas fa-palette"></i>테마 색상</div>
+                    <div class="color-palette">
+                        <div class="color-option selected" style="background: #FFCDC9;" onclick="changeTheme('strawberry', this)"></div>
+                        <div class="color-option" style="background: #C6E7FF;" onclick="changeTheme('cloud', this)"></div>
+                        <div class="color-option" style="background: #CDC1FF;" onclick="changeTheme('grape', this)"></div>
+                        <div class="color-option" style="background: #CBCBCB;" onclick="changeTheme('mono', this)"></div>
+                    </div>
+                </div>
+                <div class="setting-section">
+                    <div class="setting-title"><i class="fas fa-font"></i>글씨체</div>
+                    <div id="font-options">
+                        <div class="font-option selected" style="font-family: 'Noto Sans KR';" onclick="changeFont('Noto Sans KR', this)">Noto Sans KR</div>
+                        <div class="font-option" style="font-family: 'Gowun Dodum';" onclick="changeFont('Gowun Dodum', this)">고운돋움</div>
+                        <div class="font-option" style="font-family: 'Do Hyeon';" onclick="changeFont('Do Hyeon', this)">도현체</div>
+                        <div class="font-option" style="font-family: 'Song Myung';" onclick="changeFont('Song Myung', this)">송명</div>
+                        <div class="font-option" style="font-family: 'Jua';" onclick="changeFont('Jua', this)">주아체</div>
+                    </div>
+                </div>
+                <div class="setting-section">
+                    <div class="setting-title"><i class="fas fa-sliders-h"></i>텍스트 조정</div>
+                    <div class="flex gap-2 mb-4">
+                        <button class="style-toggle" onclick="toggleStyle('bold', this)">Bold</button>
+                        <button class="style-toggle" onclick="toggleStyle('italic', this)">Italic</button>
+                    </div>
+                    <div class="mb-4"><label class="text-xs text-gray-500">크기</label><input type="range" min="12" max="24" value="16" oninput="updateTypography('size', this.value)"></div>
+                    <div class="mb-4"><label class="text-xs text-gray-500">행간</label><input type="range" min="1.0" max="2.5" value="1.6" step="0.1" oninput="updateTypography('height', this.value)"></div>
+                </div>
+                <div class="setting-section">
+                    <div class="setting-title"><i class="fas fa-fill-drip"></i>글자 색상</div>
+                    <div class="flex items-center gap-4"><input type="color" id="text-color-picker" value="#374151" onchange="updateTypography('color', this.value)" class="w-10 h-10 border rounded cursor-pointer"></div>
+                </div>
+                <div class="mt-10 pt-6 border-t border-gray-100 text-center">
+                    <p class="text-xs text-gray-400 font-bold">CREATED BY</p><p class="text-sm font-bold theme-text mb-1">CODE</p>
+                    <a href="https://twitter.com/100D0R" target="_blank" class="text-xs text-gray-400 hover:text-blue-400"><i class="fab fa-twitter"></i> @100D0R</a>
+                    <button id="logout-btn" class="block mx-auto mt-4 text-xs text-red-400 hover:underline">로그아웃</button>
+                </div>
             </div>
         </div>
 
-        <div id="log-list" class="grid gap-6 grid-cols-1 md:grid-cols-2"></div>
+        <!-- 탭바 -->
+        <div class="tab-bar">
+            <div class="tab-item active" onclick="switchTab('main')"><i class="fas fa-home tab-icon"></i><span>메인</span></div>
+            <div class="tab-item" onclick="switchTab('album')"><i class="fas fa-images tab-icon"></i><span>앨범</span></div>
+            <div class="tab-item" onclick="switchTab('memo')"><i class="fas fa-sticky-note tab-icon"></i><span>메모</span></div>
+            <div class="tab-item" onclick="switchTab('log')"><i class="fas fa-file-alt tab-icon"></i><span>로그</span></div>
+            <div class="tab-item" onclick="switchTab('playlist')"><i class="fas fa-music tab-icon"></i><span>음악</span></div>
+            <div class="tab-item" onclick="switchTab('profile')"><i class="fas fa-user-circle tab-icon"></i><span>소개</span></div>
+            <div class="tab-item" onclick="switchTab('settings')"><i class="fas fa-cog tab-icon"></i><span>설정</span></div>
+        </div>
     </div>
 
+    <!-- 모달: 공통 -->
+    <div id="upload-modal" class="modal-overlay">
+        <div class="upload-modal-box">
+            <h3 class="text-lg font-bold mb-4">추억 기록</h3>
+            <div class="w-full aspect-[3/4] bg-gray-100 rounded mb-4 overflow-hidden relative border border-dashed border-gray-300 cursor-pointer" onclick="document.getElementById('modal-file-input').click()">
+                <img id="modal-preview" class="w-full h-full object-cover hidden">
+                <div id="modal-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400"><i class="fas fa-camera text-2xl mb-2"></i><span class="text-xs">선택</span></div>
+            </div>
+            <input type="file" id="modal-file-input" class="hidden" accept="image/*" onchange="modalPreview(this)">
+            <input type="text" id="modal-text-input" class="w-full border-b border-gray-300 p-2 text-center outline-none mb-6 text-xl" style="font-family: var(--main-font);" placeholder="문구를 입력하세요">
+            <div class="flex gap-2"><button onclick="closeModal('upload-modal')" class="flex-1 py-2 text-sm text-gray-500 bg-gray-100 rounded">취소</button><button onclick="savePolaroid()" class="flex-1 py-2 text-sm bg-black text-white rounded hover:bg-gray-800 theme-bg" style="color:#374151">등록</button></div>
+        </div>
+    </div>
+
+    <div id="memo-modal" class="modal-overlay">
+        <div class="upload-modal-box">
+            <h3 class="text-lg font-bold mb-4">메모</h3>
+            <input type="hidden" id="memo-id" value="">
+            <div class="mb-3 text-left"><label class="text-xs text-gray-500">작성자</label><input type="text" id="memo-author-input" class="w-full border border-gray-300 rounded p-2 text-sm outline-none"></div>
+            <div class="mb-4 text-left"><label class="text-xs text-gray-500">내용</label><textarea id="memo-content-input" class="w-full border border-gray-300 rounded p-2 text-sm outline-none h-24 resize-none" style="font-family: var(--main-font);"></textarea></div>
+            <div class="flex gap-2"><button onclick="closeModal('memo-modal')" class="flex-1 py-2 text-sm text-gray-500 bg-gray-100 rounded">취소</button><button onclick="deleteMemo()" id="memo-delete-btn" class="hidden flex-1 py-2 text-sm bg-red-100 text-red-500 rounded">삭제</button><button onclick="saveMemo()" class="flex-1 py-2 text-sm bg-black text-white rounded hover:bg-gray-800 theme-bg" style="color:#374151">저장</button></div>
+        </div>
+    </div>
+
+    <div id="log-modal" class="modal-overlay">
+        <div class="full-screen-modal-box">
+            <div class="novel-page-container">
+                <div class="novel-header-deco"><span class="novel-part-label" id="log-part-label">PART</span></div>
+                <input type="text" id="log-title-input" class="novel-title-input" placeholder="제목">
+                <textarea id="log-content-input" class="novel-content-input" placeholder="내용을 입력하세요..."></textarea>
+                <div class="novel-footer"><span id="log-date-display">-</span></div>
+                <input type="hidden" id="log-id" value="">
+                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
+                    <button onclick="closeModal('log-modal')" class="text-gray-400 text-sm">닫기</button>
+                    <div class="flex gap-3"><button onclick="deleteLog()" id="log-delete-btn" class="hidden text-red-400 text-sm">삭제</button><button onclick="saveLog()" class="theme-text font-bold text-sm">저장</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="music-modal" class="modal-overlay">
+        <div class="upload-modal-box">
+            <h3 class="text-lg font-bold mb-4">음악 추가</h3>
+            <input type="hidden" id="music-id" value="">
+            <div class="mb-3 text-left"><label class="text-xs text-gray-500">제목</label><input type="text" id="music-title-input" class="w-full border border-gray-300 rounded p-2 text-sm outline-none"></div>
+            <div class="mb-3 text-left"><label class="text-xs text-gray-500">가수</label><input type="text" id="music-artist-input" class="w-full border border-gray-300 rounded p-2 text-sm outline-none"></div>
+            <div class="mb-4 text-left"><label class="text-xs text-gray-500">YouTube URL</label><input type="text" id="music-url-input" class="w-full border border-gray-300 rounded p-2 text-sm outline-none"></div>
+            <div class="flex gap-2"><button onclick="closeModal('music-modal')" class="flex-1 py-2 text-sm text-gray-500 bg-gray-100 rounded">취소</button><button onclick="deleteMusic()" id="music-delete-btn" class="hidden flex-1 py-2 text-sm text-red-500 bg-red-50 rounded">삭제</button><button onclick="saveMusic()" class="flex-1 py-2 text-sm bg-black text-white rounded hover:bg-gray-800 theme-bg" style="color:#374151">추가</button></div>
+        </div>
+    </div>
+
+    <div id="lightbox-modal" class="modal-overlay" onclick="closeModal('lightbox-modal')"><img id="lightbox-img" src="" class="lightbox-img"></div>
+
+    <!-- Firebase SDK (CDN 방식 사용) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
 
     <script>
-        // ✅ 설정값
+        // ==========================================
+        // [Firebase 설정] 사용자 제공 값 적용
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAa2SXQ5M5BEVInNSYMn-ZdRAG7D9x1goE",
             authDomain: "pair-log-system.firebaseapp.com",
@@ -105,223 +402,331 @@
             measurementId: "G-YKWTHY0EG3"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        // 초기화
+        let auth, db, analytics;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            analytics = firebase.analytics(); // 애널리틱스 추가
+        } catch(e) { console.error("Firebase Init Error:", e); alert("Firebase 설정값을 확인해주세요!"); }
 
-        // DOM 요소
-        const screens = {
-            login: document.getElementById('login-screen'),
-            connect: document.getElementById('pair-connect-screen'),
-            app: document.getElementById('app-screen')
-        };
-        
+        // 전역 변수
         let currentUser = null;
-        let myPairCode = null; // 현재 사용자의 페어 코드
-        let selectedImageBase64 = null;
+        let myPairCode = null;
 
-        // 1. 로그인 로직
+        // 1. 인증 로직
+        const loginScreen = document.getElementById('login-screen');
+        const connectScreen = document.getElementById('connect-screen');
+        const appScreen = document.getElementById('app-screen');
+
         document.getElementById('google-login-btn').addEventListener('click', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider);
+            auth.signInWithPopup(provider).catch(e => alert(e.message));
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+
+        document.getElementById('connect-btn').addEventListener('click', async () => {
+            const code = document.getElementById('pair-code-input').value.trim().toUpperCase();
+            if (code.length < 3) return alert("3글자 이상 입력하세요.");
+            
+            try {
+                // 사용자 정보에 pairCode 저장
+                await db.collection('users').doc(currentUser.uid).set({
+                    email: currentUser.email,
+                    pairCode: code
+                }, { merge: true });
+                
+                myPairCode = code;
+                initApp();
+            } catch (e) { console.error(e); alert("연결 오류"); }
         });
 
         auth.onAuthStateChanged(async user => {
             if (user) {
                 currentUser = user;
-                // 사용자 정보를 확인하여 페어 코드가 있는지 체크
-                await checkUserPairStatus(user);
+                loginScreen.classList.add('hidden');
+                // 페어 코드 확인
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists && doc.data().pairCode) {
+                    myPairCode = doc.data().pairCode;
+                    initApp();
+                } else {
+                    connectScreen.classList.remove('hidden');
+                }
             } else {
-                switchScreen('login');
+                currentUser = null;
+                myPairCode = null;
+                loginScreen.classList.remove('hidden');
+                connectScreen.classList.add('hidden');
+                appScreen.classList.add('hidden');
             }
         });
 
-        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
-
-        // 2. 화면 전환 함수
-        function switchScreen(screenName) {
-            Object.values(screens).forEach(el => el.classList.add('hidden'));
-            screens[screenName].classList.remove('hidden');
+        // 앱 초기화 및 데이터 로드
+        function initApp() {
+            connectScreen.classList.add('hidden');
+            appScreen.classList.remove('hidden');
+            
+            // 실시간 리스너 등록
+            loadMeta(); // 1, 6번 탭 데이터
+            loadLogs(); // 2, 3, 4, 5번 탭 리스트 데이터
         }
 
-        // 3. 사용자 페어 상태 확인 (핵심 로직)
-        async function checkUserPairStatus(user) {
-            // 'users' 컬렉션에서 내 정보를 찾음
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            
-            if (userDoc.exists && userDoc.data().pairCode) {
-                // 이미 코드가 있다면 바로 앱으로 이동
-                myPairCode = userDoc.data().pairCode;
-                enterApp(user);
-            } else {
-                // 코드가 없다면 연동 화면으로 이동
-                switchScreen('connect');
-            }
-        }
+        // --- Firestore 데이터 처리 ---
 
-        // 4. 페어 코드 연결하기
-        document.getElementById('connect-btn').addEventListener('click', async () => {
-            const inputCode = document.getElementById('pair-code-input').value.trim().toUpperCase();
-            
-            if (inputCode.length < 3) {
-                alert("코드는 3글자 이상이어야 합니다.");
-                return;
-            }
-
-            try {
-                // 내 정보에 페어 코드 저장 ('users' 컬렉션 생성)
-                await db.collection('users').doc(currentUser.uid).set({
-                    email: currentUser.email,
-                    displayName: currentUser.displayName,
-                    pairCode: inputCode,
-                    joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                myPairCode = inputCode;
-                alert(`환영합니다! 페어 코드 [${inputCode}]로 연결되었습니다.`);
-                enterApp(currentUser);
-
-            } catch (error) {
-                console.error("Error linking pair: ", error);
-                alert("연결 중 오류가 발생했습니다.");
-            }
-        });
-
-        // 5. 앱 진입 및 데이터 로드
-        function enterApp(user) {
-            switchScreen('app');
-            document.getElementById('user-name').innerText = user.displayName;
-            document.getElementById('user-profile-img').src = user.photoURL;
-            document.getElementById('display-pair-code').innerText = myPairCode;
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString();
-            
-            loadLogs(); // 로그 불러오기
-        }
-
-        // 6. 데이터 저장 (페어 코드 포함)
-        document.getElementById('save-btn').addEventListener('click', async () => {
-            const title = document.getElementById('log-title').value;
-            const content = document.getElementById('log-content').innerHTML;
-
-            if (!title || !document.getElementById('log-content').innerText.trim()) {
-                alert("내용을 입력해주세요.");
-                return;
-            }
-
-            document.getElementById('save-loader').style.display = 'block';
-            
-            try {
-                await db.collection('logs').add({
-                    pairCode: myPairCode, // ★ 핵심: 내 ID가 아니라 '방 번호'를 저장
-                    writerUid: currentUser.uid, // 작성자는 기록해둠
-                    writerName: currentUser.displayName,
-                    title: title,
-                    content: content,
-                    image: selectedImageBase64,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    dateStr: new Date().toLocaleDateString()
-                });
-
-                // 초기화
-                document.getElementById('log-title').value = '';
-                document.getElementById('log-content').innerHTML = '';
-                document.getElementById('remove-image').click();
-                loadLogs();
-
-            } catch (e) {
-                console.error(e);
-                alert("저장 실패");
-            } finally {
-                document.getElementById('save-loader').style.display = 'none';
-            }
-        });
-
-        // 7. 데이터 불러오기 (페어 코드로 필터링)
-        async function loadLogs() {
-            const logList = document.getElementById('log-list');
-            logList.innerHTML = '';
-
-            // ★ 핵심: 'uid'가 아니라 'pairCode'가 같은 글을 가져옴
-            const snapshot = await db.collection('logs')
-                .where("pairCode", "==", myPairCode)
-                .orderBy("createdAt", "desc")
-                .get();
-
-            if (snapshot.empty) {
-                logList.innerHTML = '<p class="text-gray-400 p-4 col-span-2 text-center">아직 작성된 기록이 없습니다.<br>첫 번째 이야기를 남겨보세요.</p>';
-                return;
-            }
-
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const isMyPost = data.writerUid === currentUser.uid;
-                
-                // 카드 HTML
-                const div = document.createElement('div');
-                div.className = "bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col relative";
-                
-                let imageHtml = data.image ? `<div class="w-full h-48 bg-gray-100 rounded mb-4 overflow-hidden"><img src="${data.image}" class="w-full h-full object-cover"></div>` : '';
-                
-                // 작성자 표시 (내가 쓴 건지, 상대가 쓴 건지)
-                const badge = isMyPost 
-                    ? `<span class="bg-black text-white text-[10px] px-2 py-0.5 rounded-full absolute top-6 right-6">ME</span>`
-                    : `<span class="bg-gray-200 text-gray-600 text-[10px] px-2 py-0.5 rounded-full absolute top-6 right-6">PARTNER</span>`;
-
-                const shareText = encodeURIComponent(`[${data.title}]\n${data.content.substring(0, 30).replace(/<[^>]*>/g, '')}...\n#OurArchive`);
-                const shareUrl = `https://twitter.com/intent/tweet?text=${shareText}`;
-
-                div.innerHTML = `
-                    ${badge}
-                    ${imageHtml}
-                    <div class="mb-3 mt-1">
-                        <h4 class="font-bold text-xl font-serif">${data.title}</h4>
-                        <span class="text-xs text-gray-400">${data.dateStr} · by ${data.writerName}</span>
-                    </div>
-                    <div class="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3 font-serif">${data.content}</div>
-                    
-                    <div class="mt-auto flex justify-end gap-3 pt-3 border-t border-gray-50">
-                        ${isMyPost ? `<button onclick="deleteLog('${doc.id}')" class="text-xs text-red-300 hover:text-red-500">삭제</button>` : ''}
-                        <a href="${shareUrl}" target="_blank" class="text-xs text-gray-400 hover:text-blue-400 flex items-center gap-1"><i class="fab fa-x-twitter"></i> 공유</a>
-                    </div>
-                `;
-                logList.appendChild(div);
+        // A. 메타 데이터 (Main, Profile)
+        function loadMeta() {
+            db.collection('couples').doc(myPairCode).onSnapshot(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if(data.title) document.getElementById('main-title').value = data.title;
+                    if(data.subtitle) document.getElementById('main-subtitle').value = data.subtitle;
+                    if(data.nameA) document.getElementById('name-a').value = data.nameA;
+                    if(data.nameB) document.getElementById('name-b').value = data.nameB;
+                    if(data.startDate) {
+                        document.getElementById('start-date').value = data.startDate;
+                        calculateDDay();
+                    }
+                    if(data.mainPhoto) document.getElementById('img-main-photo').src = data.mainPhoto;
+                    if(data.profileA) document.getElementById('img-char-a').src = data.profileA;
+                    if(data.profileB) document.getElementById('img-char-b').src = data.profileB;
+                    if(data.introHeart) document.getElementById('img-intro-heart').src = data.introHeart;
+                    if(data.introA) document.getElementById('img-intro-a').src = data.introA;
+                    if(data.introB) document.getElementById('img-intro-b').src = data.introB;
+                    if(data.introCouple) document.getElementById('img-intro-couple').src = data.introCouple;
+                    // intro info는 생략 (복잡도 감소)
+                }
             });
         }
 
-        // 이미지 처리 로직 등은 동일
-        const imageUpload = document.getElementById('image-upload');
-        const previewImage = document.getElementById('preview-image');
-        const removeImage = document.getElementById('remove-image');
+        async function saveMeta(key, value) {
+            await db.collection('couples').doc(myPairCode).set({ [key]: value }, { merge: true });
+        }
 
-        imageUpload.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                if (file.size > 1024 * 1024) return alert("1MB 이하 이미지만 가능합니다.");
+        function uploadImage(input, imgId, fieldName) {
+            if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    selectedImageBase64 = e.target.result;
-                    previewImage.src = selectedImageBase64;
-                    previewImage.classList.remove('hidden');
-                    removeImage.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        removeImage.addEventListener('click', () => {
-            selectedImageBase64 = null;
-            previewImage.src = '';
-            previewImage.classList.add('hidden');
-            removeImage.classList.add('hidden');
-            imageUpload.value = '';
-        });
-
-        window.deleteLog = async (docId) => {
-            if(confirm("기록을 삭제하시겠습니까?")) {
-                await db.collection('logs').doc(docId).delete();
-                loadLogs();
+                reader.onload = async function(e) {
+                    const base64 = e.target.result;
+                    document.getElementById(imgId).src = base64;
+                    await saveMeta(fieldName, base64);
+                }
+                reader.readAsDataURL(input.files[0]);
             }
         }
+
+        // B. 로그 데이터 (Album, Memo, Novel, Music)
+        function loadLogs() {
+            db.collection('logs').where('pairCode', '==', myPairCode)
+              .orderBy('createdAt', 'desc')
+              .onSnapshot(snapshot => {
+                  // 초기화
+                  document.getElementById('album-grid').innerHTML = '';
+                  document.getElementById('memo-grid').innerHTML = '';
+                  document.getElementById('novel-book-body').innerHTML = '';
+                  document.getElementById('playlist-container').innerHTML = '';
+
+                  let novelCount = 0;
+                  const logs = [];
+                  snapshot.forEach(doc => logs.push({id: doc.id, ...doc.data()}));
+                  
+                  // 소설은 순서대로 봐야하므로 정렬 다시 (오름차순)
+                  const novels = logs.filter(l => l.type === 'novel').sort((a,b) => a.createdAt - b.createdAt);
+                  const others = logs.filter(l => l.type !== 'novel'); // 나머지는 최신순
+
+                  // 렌더링
+                  others.forEach(data => renderItem(data));
+                  novels.forEach(data => renderNovel(data, ++novelCount));
+              });
+        }
+
+        function renderItem(data) {
+            if (data.type === 'photo') {
+                const div = document.createElement('div');
+                div.className = 'polaroid';
+                div.onclick = () => openLightbox(div);
+                div.innerHTML = `<img src="${data.image}" class="polaroid-img"><div class="polaroid-caption">${data.text}</div>`;
+                document.getElementById('album-grid').appendChild(div);
+            } else if (data.type === 'memo') {
+                const div = document.createElement('div');
+                div.className = 'memo-card';
+                div.onclick = () => editMemo(data);
+                div.innerHTML = `<div class="memo-tape"></div><div class="memo-content">${data.text}</div><div class="memo-footer"><span>${data.dateStr}</span><span class="memo-author">${data.author}</span></div>`;
+                document.getElementById('memo-grid').appendChild(div);
+            } else if (data.type === 'music') {
+                const div = document.createElement('div');
+                div.className = 'music-card';
+                const embedUrl = `https://www.youtube.com/embed/${data.videoId}`;
+                div.innerHTML = `<div class="music-video-wrapper"><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>
+                                <div class="music-info"><div class="music-text"><h3>${data.title}</h3><p>${data.artist}</p></div>
+                                <div class="music-actions"><div class="music-btn" onclick="editMusic('${data.id}', '${data.title}', '${data.artist}', '${data.videoId}')"><i class="fas fa-edit"></i></div></div></div>`;
+                document.getElementById('playlist-container').appendChild(div);
+            }
+        }
+
+        function renderNovel(data, count) {
+            const div = document.createElement('div');
+            div.className = 'novel-chapter';
+            div.onclick = () => editNovel(data, count);
+            div.innerHTML = `<div class="chapter-edit-hint"><i class="fas fa-edit"></i></div>
+                             <div class="chapter-header"><span class="chapter-number">Chapter ${count}</span><h2 class="chapter-title">${data.title}</h2></div>
+                             <div class="chapter-content">${data.text}</div>
+                             <div class="chapter-footer">${data.dateStr}</div>`;
+            const container = document.getElementById('novel-book-body');
+            container.appendChild(div);
+            container.appendChild(makeDivider());
+        }
+        function makeDivider() { const d = document.createElement('div'); d.className = 'chapter-divider'; d.innerText = '✻'; return d; }
+
+        // --- 각 기능별 저장 로직 (Firestore) ---
+
+        // Album
+        function savePolaroid() {
+            const file = document.getElementById('modal-file-input').files[0];
+            const text = document.getElementById('modal-text-input').value;
+            if (!file) return alert("사진 필수");
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                await db.collection('logs').add({
+                    pairCode: myPairCode, type: 'photo',
+                    image: e.target.result, text: text,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                closeModal('upload-modal');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Memo
+        function editMemo(data) {
+            document.getElementById('memo-modal').classList.add('open');
+            document.getElementById('memo-id').value = data.id;
+            document.getElementById('memo-author-input').value = data.author;
+            document.getElementById('memo-content-input').value = data.text;
+            document.getElementById('memo-delete-btn').classList.remove('hidden');
+        }
+        function openMemoModal() {
+            document.getElementById('memo-modal').classList.add('open');
+            document.getElementById('memo-id').value = '';
+            document.getElementById('memo-author-input').value = '';
+            document.getElementById('memo-content-input').value = '';
+            document.getElementById('memo-delete-btn').classList.add('hidden');
+        }
+        async function saveMemo() {
+            const id = document.getElementById('memo-id').value;
+            const author = document.getElementById('memo-author-input').value;
+            const text = document.getElementById('memo-content-input').value;
+            if(!text) return;
+
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()} ${now.getHours()}:${now.getMinutes()}`;
+            
+            const payload = { pairCode: myPairCode, type: 'memo', author, text, dateStr, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+
+            if (id) await db.collection('logs').doc(id).update({ author, text });
+            else await db.collection('logs').add(payload);
+            closeModal('memo-modal');
+        }
+        async function deleteMemo() {
+            const id = document.getElementById('memo-id').value;
+            if(id && confirm("삭제?")) { await db.collection('logs').doc(id).delete(); closeModal('memo-modal'); }
+        }
+
+        // Novel
+        function editNovel(data, count) {
+            document.getElementById('log-modal').classList.add('open');
+            document.getElementById('log-id').value = data.id;
+            document.getElementById('log-part-label').innerText = `PART ${count}`;
+            document.getElementById('log-title-input').value = data.title;
+            document.getElementById('log-content-input').value = data.text;
+            document.getElementById('log-date-display').innerText = data.dateStr;
+            document.getElementById('log-delete-btn').classList.remove('hidden');
+        }
+        function openLogModal() {
+            document.getElementById('log-modal').classList.add('open');
+            document.getElementById('log-id').value = '';
+            document.getElementById('log-title-input').value = '';
+            document.getElementById('log-content-input').value = '';
+            document.getElementById('log-date-display').innerText = '-';
+            document.getElementById('log-delete-btn').classList.add('hidden');
+        }
+        async function saveLog() {
+            const id = document.getElementById('log-id').value;
+            const title = document.getElementById('log-title-input').value;
+            const text = document.getElementById('log-content-input').value;
+            if(!title || !text) return;
+
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 기록`;
+            const payload = { pairCode: myPairCode, type: 'novel', title, text, dateStr, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+
+            if(id) await db.collection('logs').doc(id).update({ title, text });
+            else await db.collection('logs').add(payload);
+            closeModal('log-modal');
+        }
+        async function deleteLog() {
+            const id = document.getElementById('log-id').value;
+            if(id && confirm("삭제?")) { await db.collection('logs').doc(id).delete(); closeModal('log-modal'); }
+        }
+
+        // Music
+        function editMusic(id, title, artist, videoId) {
+            document.getElementById('music-modal').classList.add('open');
+            document.getElementById('music-id').value = id;
+            document.getElementById('music-title-input').value = title;
+            document.getElementById('music-artist-input').value = artist;
+            document.getElementById('music-url-input').value = `https://youtu.be/${videoId}`;
+            document.getElementById('music-delete-btn').classList.remove('hidden');
+        }
+        function openMusicModal() {
+            document.getElementById('music-modal').classList.add('open');
+            document.getElementById('music-id').value = '';
+            document.getElementById('music-title-input').value = '';
+            document.getElementById('music-artist-input').value = '';
+            document.getElementById('music-url-input').value = '';
+            document.getElementById('music-delete-btn').classList.add('hidden');
+        }
+        async function saveMusic() {
+            const id = document.getElementById('music-id').value;
+            const title = document.getElementById('music-title-input').value;
+            const artist = document.getElementById('music-artist-input').value;
+            const url = document.getElementById('music-url-input').value;
+            if(!title || !url) return alert("필수 입력");
+
+            let videoId = "";
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            if (match && match[2].length == 11) videoId = match[2];
+            else return alert("유튜브 링크 확인 필요");
+
+            const payload = { pairCode: myPairCode, type: 'music', title, artist, videoId, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+
+            if(id) await db.collection('logs').doc(id).update({ title, artist, videoId });
+            else await db.collection('logs').add(payload);
+            closeModal('music-modal');
+        }
+        async function deleteMusic() {
+            const id = document.getElementById('music-id').value;
+            if(id && confirm("삭제?")) { await db.collection('logs').doc(id).delete(); closeModal('music-modal'); }
+        }
+
+        // --- 기타 UI 함수 ---
+        function switchTab(t){document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.querySelectorAll('.tab-item').forEach(i=>i.classList.remove('active'));event.currentTarget.classList.add('active');}
+        function calculateDDay(){const i=document.getElementById('start-date').value;if(!i)return;const s=new Date(i),t=new Date();s.setHours(0,0,0,0);t.setHours(0,0,0,0);const d=Math.ceil((t-s)/(1000*60*60*24));document.getElementById('d-day-display').innerText=d>=0?`D+${d+1}`:`D${d}`;if(d>=0){const c=d+1,n=Math.ceil(c/100)*100,p=n-100;let per=(c-p)/100*100;if(per===0&&c>0)per=100;document.getElementById('progress-start-label').innerText=`D+${p}`;document.getElementById('progress-end-label').innerText=`D+${n}`;const b=document.getElementById('anniversary-bar');setTimeout(()=>{b.style.width=`${per}%`;document.getElementById('percent-tooltip').innerText=`${Math.round(per)}%`;document.getElementById('percent-tooltip').style.left=`${per}%`;},100);document.getElementById('remaining-days-text').innerText=n-c===0?"🎉 오늘이 기념일이에요! 축하해요! 🎉":`${n}일까지 ${n-c}일 남았어요!`;}}
+        function openUploadModal(){document.getElementById('upload-modal').classList.add('open');document.getElementById('modal-file-input').value='';document.getElementById('modal-text-input').value='';document.getElementById('modal-preview').classList.add('hidden');document.getElementById('modal-placeholder').classList.remove('hidden');}
+        function closeModal(id){document.getElementById(id).classList.remove('open');}
+        function modalPreview(i){if(i.files&&i.files[0]){const r=new FileReader();r.onload=e=>{const m=document.getElementById('modal-preview');m.src=e.target.result;m.classList.remove('hidden');document.getElementById('modal-placeholder').classList.add('hidden');};r.readAsDataURL(i.files[0]);}}
+        function openLightbox(e){document.getElementById('lightbox-img').src=e.querySelector('img').src;document.getElementById('lightbox-modal').classList.add('open');}
+        function addInfoItem(target){const c=document.getElementById('info-list-'+target),d=document.createElement('div');d.className='info-item';d.innerHTML=`<span class="info-key" contenteditable="true">항목</span><span class="info-val" contenteditable="true">내용</span>`;c.appendChild(d);}
+        
+        // 설정
+        function changeTheme(n,e){const r=document.documentElement;document.querySelectorAll('.color-option').forEach(o=>o.classList.remove('selected'));e.classList.add('selected');if(n=='strawberry'){r.style.setProperty('--theme-color','#FFCDC9');r.style.setProperty('--theme-light','#FFF0EE');r.style.setProperty('--bg-color','#FFFAFA');}else if(n=='cloud'){r.style.setProperty('--theme-color','#C6E7FF');r.style.setProperty('--theme-light','#EFF8FF');r.style.setProperty('--bg-color','#F8FCFF');}else if(n=='grape'){r.style.setProperty('--theme-color','#CDC1FF');r.style.setProperty('--theme-light','#F2EFFF');r.style.setProperty('--bg-color','#FAF9FF');}else{r.style.setProperty('--theme-color','#CBCBCB');r.style.setProperty('--theme-light','#F3F3F3');r.style.setProperty('--bg-color','#FAFAFA');}}
+        function changeFont(n,e){document.documentElement.style.setProperty('--main-font',n);document.querySelectorAll('.font-option').forEach(o=>o.classList.remove('selected'));e.classList.add('selected');}
+        function updateTypography(t,v){const r=document.documentElement;if(t=='size')r.style.setProperty('--base-font-size',v+'px');else if(t=='height')r.style.setProperty('--line-height',v);else if(t=='color')r.style.setProperty('--text-color',v);}
+        function toggleStyle(s,b){const r=document.documentElement;b.classList.toggle('active');if(s=='bold')r.style.setProperty('--font-weight',b.classList.contains('active')?'700':'400');else r.style.setProperty('--font-style',b.classList.contains('active')?'italic':'normal');}
     </script>
 </body>
 </html>
